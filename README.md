@@ -12,7 +12,7 @@ a Java + SWT desktop application built to flash the MX29L3211 chip for
 SNES/SFC cartridge reproductions, talking to an Arduino Mega 2560 over
 serial.
 
-Starting from that original Java/Arduino codebase, with the help of
+Starting from that original Java/Arduino codebase having a hell of dependancies (took me hours to compile it), with the help of
 Claude AI I:
 
 - **Translated the Java host application into Python** — a small,
@@ -35,8 +35,7 @@ Claude AI I:
 All the chips this project targets are **3V/3.3V parts**. The Arduino
 Mega 2560 runs its logic at 5V by default, and driving a 3.3V-only
 flash chip's inputs at 5V is not something to rely on — it's outside
-the chip's rated I/O voltage and it's what actually flashes these
-parts, not something to work around with clever firmware.
+the chip's rated I/O voltage.
 
 The fix used in this project is to modify the Arduino Mega itself to
 run at 3.3V, rather than adding external level-shifters on every
@@ -49,8 +48,7 @@ See the picture below for exactly how this board was modified:
 ![Arduino Mega 3.3V mod](Pictures/Arduino_mega_3.3V_mod.png)
 
 If you're doing this yourself: the usual approach is to bypass/replace
-the Mega's onboard 5V regulator with a 3.3V one (or feed regulated
-3.3V directly into the board), so every I/O pin - not just some of
+the Mega's onboard 5V regulator with a 3.3V one, so every I/O pin - not just some of
 them - runs at the chip-safe voltage. Double check your specific
 board's regulator and crystal/oscillator before doing this; running
 an ATmega2560 at 3.3V has a lower maximum clock frequency than at 5V
