@@ -32,7 +32,7 @@ them - runs at the chip-safe voltage. Double check your specific board regulator
 
 Arduino Mega are dirt cheap on second hand market, in particular Chinese clones, so I recommend butchering an old one rather than a new. Mine was sold as "working" with the voltage regulator completely charred, exactly what I needed for the mod.
 
-## 3. Doing the device
+## 3. Hardware: crafting the device
 
 ![](/Pictures/SOP44_Pinout.png)
 
