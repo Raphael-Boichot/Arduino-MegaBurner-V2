@@ -56,7 +56,7 @@ able to walk away and come back later.
 | `megaburner/fileio.py`     | Load/save ROM files, random test-data generator.       |
 | `megaburner/progress.py`   | Plain stdlib console progress bar + spinner (no extra deps). |
 | `megaburner/exceptions.py` | `CommException`.                                       |
-| `test_megaburner.py`       | Full round-trip test: check → erase → write → read back → CRC32. |
+| `full_cycle_chip.py`       | Full round-trip test: check → erase → write → read back → CRC32. |
 | `dump_chip.py`             | Read-only: check → read → save. No erase, no write — safe for a first look at an unfamiliar chip, or just backing up a cart. |
 
 ## Using the driver directly (for your own scripts later)
