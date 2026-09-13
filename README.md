@@ -56,7 +56,14 @@ an ATmega2560 at 3.3V has a lower maximum clock frequency than at 5V
 per its datasheet, and that's worth being aware of even if it isn't
 the main failure mode you'll run into.
 
-## 3. Arduino firmware structure
+## 3. Doing the device
+
+![](/Pictures/SOP44_Pinout.png)
+![](/Pictures/Mega_and_shields.JPG)
+![](/Pictures/Tower_of_power.jpg)
+
+
+## 4. Arduino firmware structure
 
 The sketch lives under `Arduino_MegaBurner/`. Rough shape:
 
@@ -96,7 +103,7 @@ connection):
 4. Reflash, then verify with a read-only check (chip ID, then a read)
    before ever trying an erase/write on real hardware.
 
-## 4. Python host
+## 5. Python host
 
 The host code lives under `Python_MegaBurner/`, structured as a small
 package plus two ready-to-run scripts. Only dependency: `pyserial`
