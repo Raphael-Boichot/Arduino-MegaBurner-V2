@@ -28,6 +28,7 @@ Claude AI I:
 - **Reworked the Arduino firmware** so chip selection happens at
   **runtime**, over serial, instead of needing a firmware reflash
   every time you swap chips.
+- **Bullet-proofed the toolchain** with endurance runs on real chips.
 
 ## 2. Hardware: the Arduino Mega 3.3V mod
 
@@ -59,9 +60,16 @@ the main failure mode you'll run into.
 ## 3. Doing the device
 
 ![](/Pictures/SOP44_Pinout.png)
+
+The pinout have nothing particular. It requires lots of wiring but it does not justify making a dedicated PCB because wires are cool. Just use a generic Arduino Mega shield.
+
 ![](/Pictures/Mega_and_shields.JPG)
+
+The SOP44 to DIP44 adapter in generic, nothing fancy. I've mounted it on pin headers in order to be able to change it without wasting the shield.
+
 ![](/Pictures/Tower_of_power.jpg)
 
+That's it. verify each connection with a multimeter before attempting any burn.
 
 ## 4. Arduino firmware structure
 
