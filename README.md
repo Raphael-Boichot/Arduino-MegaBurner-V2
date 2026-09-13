@@ -8,15 +8,12 @@ An Arduino Mega 2560-based programmer for 3.3V parallel flash/EPROM chips used i
 
 I've made this project because I had an urgent need to read / write the three chips supported here for a [Neo Geo bootleg project](https://github.com/Raphael-Boichot/Neo-Geo-Sengoku-2-Red-Blood).
 
-This project originates from [maximaas/MegaBurner](https://github.com/maximaas/MegaBurner), a Java + SWT desktop application built to flash the MX29L3211 chip for SNES/SFC cartridge reproductions, talking to an Arduino Mega 2560 over serial.
+This project originates from [maximaas/MegaBurner](https://github.com/maximaas/MegaBurner), a Java + SWT desktop application built to flash the MX29L3211 chip for SNES/SFC cartridge reproductions, talking to an Arduino Mega 2560 over serial. The original Java/Arduino codebase has a hell of dependencies and is not portable at all. So:
 
-Starting from that original Java/Arduino codebase (having a hell of dependancies and compiling in an humoungus .exe), with the help of
-Claude A.I.:
-
-- **I translated the Java host application into Python** — a small, dependency-light (`pyserial` only) command-line driver and a couple of ready-to-run scripts, replacing the SWT GUI app.
-- **I expanded chip support** beyond the original single MX29L3211 target, adding the MX29LV320E (Top-Boot and Bottom-Boot) and the MX26L6420, each verified against its own datasheet rather than assumed to behave like the others — they don't always agree on unlock addresses, program granularity, reset sequences, or even bus width quirks, and a few real bugs (busy-polling, hardware pin-swap workarounds) turned up along the way.
+- **I translated the Java host application into the most simple Python code** — a small, dependency-light (`pyserial` only) command-line driver and a couple of ready-to-run scripts, replacing the SWT GUI app.
+- **I expanded chip support for my needs** beyond the original single MX29L3211 target, adding the MX29LV320E (Top-Boot and Bottom-Boot) and the MX26L6420, each verified against its own datasheet rather than assumed to behave like the others — they don't always agree on unlock addresses, program granularity, reset sequences, or even bus width quirks, and a few real bugs (busy-polling, hardware pin-swap workarounds) turned up along the way.
 - **I reworked the Arduino firmware** so chip selection happens at **runtime**, over serial, instead of needing a firmware reflash every time you swap chips.
-- **I bullet-proofed the toolchain** with lots of endurance runs on real chips.
+- **I bullet-proofed the tool chain** with lots of endurance runs on real chips before using it with success.
 
 ## 2. Hardware: the Arduino Mega 3.3V mod
 
