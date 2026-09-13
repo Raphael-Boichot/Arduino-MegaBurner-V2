@@ -1,6 +1,8 @@
-# Arduino Mega EPROM/Flash Burner
+# Arduino Mega EPROM/Flash burner for some SOP44 chips
 
 An Arduino Mega 2560-based programmer for 3.3V parallel flash/EPROM chips used in cartridge-repro projects (Neo Geo, SNES/SFC, etc.), controlled from a Python host over serial: check chip ID, erase, write a ROM file, read back, and verify.
+
+![](/Pictures/Tower_of_power.jpg)
 
 ## 1. Origin
 
@@ -37,11 +39,7 @@ The pinout have nothing particular. It requires lots of wiring but it does not j
 
 ![](/Pictures/Mega_and_shields.JPG)
 
-The SOP44 to DIP44 adapter in generic, nothing fancy. I've mounted it on pin headers in order to be able to change it without wasting the shield.
-
-![](/Pictures/Tower_of_power.jpg)
-
-That's it. verify each connection with a multimeter before attempting any burn.
+The SOP44 to DIP44 adapter in generic, nothing fancy. I've mounted it on pin headers in order to be able to change it without wasting the shield. That's it. Verify each connection with a multimeter before attempting any burn.
 
 ## 4. Arduino firmware structure
 
