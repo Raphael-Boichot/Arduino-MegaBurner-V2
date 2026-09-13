@@ -20,7 +20,7 @@ Open `test_megaburner.py`, edit the **CONFIGURATION** block at the top
 (at minimum, set `COM_PORT` to your board's port), then run:
 
 ```
-python test_megaburner.py
+python full_cycle_chip.py
 ```
 
 It will, in order, with a progress bar/spinner for each step:
