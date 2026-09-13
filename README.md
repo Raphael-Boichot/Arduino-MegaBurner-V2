@@ -49,7 +49,7 @@ The sketch lives under `Arduino_MegaBurner/`. Rough shape:
 
 | File | Role |
 |------|------|
-| `MegaBurner_arduino.ino` | Main sketch: serial command dispatch (`C`/`R`/`E`/`W`/`S`), the two activity LEDs (D12 = read, D13 = write), the startup "I'm alive" LED flash, and runtime chip selection via the `activeChip` pointer. |
+| `MegaBurner_arduino.ino` | Main sketch: serial command dispatch (`C`/`R`/`E`/`W`/`S`), the two activity LEDs (D12 = write, D13 = read), the startup "I'm alive" LED flash, and runtime chip selection via the `activeChip` pointer. |
 | `FlashChip.h` | Abstract base class every chip driver implements (`init`, `readId`, `reset`, `read16`, `write16`, `erase`) — this is what makes runtime chip switching possible. |
 | `MX29L3211.h` / `.ino` | Driver for the MX29L3211 (has a real multi-word page-buffer program feature). |
 | `MX29LV320E.h` / `.ino` | Driver for MX29LV320E Top-Boot/Bottom-Boot (single-word program only; one driver covers both boot variants — they only differ in silicon ID, not command set). |
@@ -98,7 +98,7 @@ python dump_chip.py
 python full_cycle_chip.py
 ```
 
-Both scripts create their output files (ROM dumps, readback files) next to the script itself, regardless of what folder you launched Python from.
+Both scripts create their output files (ROM dumps, readback files) next to the script itself, regardless of what folder you launched Python from. The code is voluntarily "script only" to keep the project as much portable as possible.
 
 ### Adding a chip to the Python side
 
