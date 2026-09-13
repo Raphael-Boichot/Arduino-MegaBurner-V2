@@ -1,6 +1,6 @@
-# Arduino Mega EPROM/Flash burner for some SOP44 chips
+# Arduino Mega EEPROM/Flash burner for some SOP44 chips
 
-An Arduino Mega 2560-based programmer for 3.3V parallel flash/EPROM chips used in cartridge-repro projects (Neo Geo, SNES/SFC, etc.), controlled from a Python host over serial: check chip ID, erase, write a ROM file, read back, and verify.
+An Arduino Mega 2560-based programmer for 3.3V parallel flash/EPROM chips used in cartridge-repro projects (Neo Geo, SNES/SFC, etc.), controlled from a Python host over serial: check chip ID, erase, write a ROM file, read back, and verify. It can easily be modified to handle other SOP44 chips as long as they operate at 3.3V only.
 
 ![](/Pictures/Tower_of_power.jpg)
 
@@ -9,12 +9,12 @@ An Arduino Mega 2560-based programmer for 3.3V parallel flash/EPROM chips used i
 This project originates from [maximaas/MegaBurner](https://github.com/maximaas/MegaBurner), a Java + SWT desktop application built to flash the MX29L3211 chip for SNES/SFC cartridge reproductions, talking to an Arduino Mega 2560 over serial.
 
 Starting from that original Java/Arduino codebase having a hell of dependancies (took me hours to compile it), with the help of
-Claude AI I:
+Claude A.I.:
 
-- **Translated the Java host application into Python** — a small, dependency-light (`pyserial` only) command-line driver and a couple of ready-to-run scripts, replacing the SWT GUI app.
-- **Expanded chip support** beyond the original single MX29L3211 target, adding the MX29LV320E (Top-Boot and Bottom-Boot) and the MX26L6420, each verified against its own datasheet rather than assumed to behave like the others — they don't always agree on unlock addresses, program granularity, reset sequences, or even bus width quirks, and a few real bugs (busy-polling, hardware pin-swap workarounds) turned up along the way.
-- **Reworked the Arduino firmware** so chip selection happens at **runtime**, over serial, instead of needing a firmware reflash every time you swap chips.
-- **Bullet-proofed the toolchain** with lots of endurance runs on real chips.
+- **I translated the Java host application into Python** — a small, dependency-light (`pyserial` only) command-line driver and a couple of ready-to-run scripts, replacing the SWT GUI app.
+- **I expanded chip support** beyond the original single MX29L3211 target, adding the MX29LV320E (Top-Boot and Bottom-Boot) and the MX26L6420, each verified against its own datasheet rather than assumed to behave like the others — they don't always agree on unlock addresses, program granularity, reset sequences, or even bus width quirks, and a few real bugs (busy-polling, hardware pin-swap workarounds) turned up along the way.
+- **I reworked the Arduino firmware** so chip selection happens at **runtime**, over serial, instead of needing a firmware reflash every time you swap chips.
+- **I bullet-proofed the toolchain** with lots of endurance runs on real chips.
 
 ## 2. Hardware: the Arduino Mega 3.3V mod
 
