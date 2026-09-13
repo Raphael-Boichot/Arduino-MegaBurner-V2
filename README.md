@@ -1,6 +1,6 @@
-# Arduino Mega EEPROM/Flash burner for some SOP44 chips
+# Arduino Mega EEPROM/Flash burner for some PSOP44 chips
 
-An Arduino Mega 2560-based programmer for 3.3V parallel flash/EPROM chips used in cartridge-repro projects (Neo Geo, SNES/SFC, etc.), controlled from a Python host over serial: check chip ID, erase, write a ROM file, read back, and verify. It can easily be modified to handle other SOP44 chips as long as they operate at 3.3V only.
+An Arduino Mega 2560-based programmer for 3.3V parallel flash/EPROM chips used in cartridge-repro projects (Neo Geo, SNES/SFC, etc.), controlled from a Python host over serial: check chip ID, erase, write a ROM file, read back, and verify. It can easily be modified to handle other PSOP44 chips as long as they operate at 3.3V only.
 
 ![](/Pictures/Tower_of_power.jpg)
 
@@ -8,7 +8,7 @@ An Arduino Mega 2560-based programmer for 3.3V parallel flash/EPROM chips used i
 
 This project originates from [maximaas/MegaBurner](https://github.com/maximaas/MegaBurner), a Java + SWT desktop application built to flash the MX29L3211 chip for SNES/SFC cartridge reproductions, talking to an Arduino Mega 2560 over serial.
 
-Starting from that original Java/Arduino codebase having a hell of dependancies (took me hours to compile it), with the help of
+Starting from that original Java/Arduino codebase (having a hell of dependancies and compiling in an humoungus .exe), with the help of
 Claude A.I.:
 
 - **I translated the Java host application into Python** — a small, dependency-light (`pyserial` only) command-line driver and a couple of ready-to-run scripts, replacing the SWT GUI app.
@@ -18,9 +18,7 @@ Claude A.I.:
 
 ## 2. Hardware: the Arduino Mega 3.3V mod
 
-All the chips this project targets are **3V/3.3V parts**. The Arduino Mega 2560 runs its logic at 5V by default, and driving a 3.3V-only flash chip's inputs at 5V is not something to rely on — it's outside the chip's rated I/O voltage.
-
-The fix used in this project is to modify the Arduino Mega itself to run at 3.3V, rather than adding external level-shifters on every address/data/control line (24 address + 16 data + several control lines — level-shifting all of that is a lot more hardware than re-powering the board at the right voltage in the first place).
+All the chips this project targets are **3V/3.3V parts**. The Arduino Mega 2560 runs its logic at 5V by default, and driving a 3.3V-only flash chip's inputs at 5V is not something to rely on — it's outside the chip's rated I/O voltage. The fix used in this project is to modify the Arduino Mega itself to run at 3.3V, rather than adding external level-shifters.
 
 See the picture below for exactly how this board was modified (Chinese clone here, mod is very easy):
 
@@ -29,7 +27,7 @@ See the picture below for exactly how this board was modified (Chinese clone her
 If you're using an official product, follow the [Adafruit guide](https://learn.adafruit.com/arduino-tips-tricks-and-techniques/3-3v-conversion) as the voltage regulator is not the same.
 
 The usual approach is anyway to bypass/replace the Mega's onboard 5V regulator with a 3.3V one, so every I/O pin - not just some of
-them - runs at the chip-safe voltage. Double check your specific board regulator pinout before doing this swap (mine was the same); running an ATmega2560 at 3.3V has a lower maximum clock frequency than at 5V. It does not affect this project.
+them - runs at the chip-safe voltage. Double check your specific board regulator pinout before doing this swap (mine was the same as the AMS1117 3.3V required here). Running an ATmega2560 at 3.3V has a lower maximum clock frequency than at 5V. It does not affect this project.
 
 Arduino Mega are dirt cheap on second hand market, in particular Chinese clones, so I recommend butchering an old one rather than a new. Mine was sold as "working" with the voltage regulator completely charred, exactly what I needed for the mod.
 
@@ -37,7 +35,7 @@ Arduino Mega are dirt cheap on second hand market, in particular Chinese clones,
 
 ![](/Pictures/SOP44_Pinout.png)
 
-The pinout have nothing particular. It requires lots of wiring but it does not justify making a dedicated PCB because wires are cool. Just use a generic Arduino Mega shield.
+The pinout have nothing particular. It requires lots of spaghetti wiring but it does not justify making a dedicated PCB because wires are cool. Just use a generic Arduino Mega shield and solder.
 
 You can add a red LED connected to D12 (Writing) and a green LED connected to D13 (Reading) to have real time information from the board itself. Use 360 Ohms resistors to protect them.
 
