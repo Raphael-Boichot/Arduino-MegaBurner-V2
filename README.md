@@ -41,7 +41,7 @@ You can add a red LED connected to D12 (Writing) and a green LED connected to D1
 
 ![](/Pictures/Mega_and_shields.JPG)
 
-The SOP44 to DIP44 adapter is generic, nothing fancy. I've mounted it on pin headers in order to be able to change it without wasting the shield. That's it. Verify each connection with a multimeter before attempting any burn.
+The PSOP44 to DIP44 adapter is a generic brand from Amazon, nothing fancy. I've mounted it on pin headers in order to be able to change it without wasting the shield. Double check each connection with a multimeter before attempting any burn.
 
 ## 4. Arduino firmware structure
 
