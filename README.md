@@ -95,7 +95,7 @@ supported chips is right there in the file), then run it:
 
 ```
 python dump_chip.py
-python test_megaburner.py
+python full_cycle_chip.py
 ```
 
 Both scripts create their output files (ROM dumps, readback files) next to the script itself, regardless of what folder you launched Python from.
