@@ -22,14 +22,16 @@ All the chips this project targets are **3V/3.3V parts**. The Arduino Mega 2560 
 
 The fix used in this project is to modify the Arduino Mega itself to run at 3.3V, rather than adding external level-shifters on every address/data/control line (24 address + 16 data + several control lines — level-shifting all of that is a lot more hardware than re-powering the board at the right voltage in the first place).
 
-See the picture below for exactly how this board was modified:
+See the picture below for exactly how this board was modified (Chinese clone here, mod is very easy):
 
 ![Arduino Mega 3.3V mod](Pictures/Arduino_mega_3.3V_mod.png)
 
-If you're doing this yourself: the usual approach is to bypass/replace the Mega's onboard 5V regulator with a 3.3V one, so every I/O pin - not just some of
-them - runs at the chip-safe voltage. Double check your specific board regulator pinout before doing this sap (mine was the same); running an ATmega2560 at 3.3V has a lower maximum clock frequency than at 5V per its datasheet, and that's worth being aware of if you reuse this board for other projects.
+If you're using an official product, follow the [Adafruit guide](https://learn.adafruit.com/arduino-tips-tricks-and-techniques/3-3v-conversion) as the voltage regulator is not the same.
 
-Arduino Mega are dirt cheap on second hand market so I recommend butchering an old one rather than a new. Mine was sold as "working" with the voltage regulator burnt, exactly what I needed for the mod.
+The usual approach is anyway to bypass/replace the Mega's onboard 5V regulator with a 3.3V one, so every I/O pin - not just some of
+them - runs at the chip-safe voltage. Double check your specific board regulator pinout before doing this swap (mine was the same); running an ATmega2560 at 3.3V has a lower maximum clock frequency than at 5V. It does not affect this project.
+
+Arduino Mega are dirt cheap on second hand market, in particular Chinese clones, so I recommend butchering an old one rather than a new. Mine was sold as "working" with the voltage regulator completely charred, exactly what I needed for the mod.
 
 ## 3. Doing the device
 
