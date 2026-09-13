@@ -37,7 +37,7 @@ Arduino Mega are dirt cheap on second hand market so I recommend butchering an o
 
 The pinout have nothing particular. It requires lots of wiring but it does not justify making a dedicated PCB because wires are cool. Just use a generic Arduino Mega shield.
 
-You can add a red LED connected to D12 (Write) and a green LED connected to D13 (read) to have real time information from the board itself. Use 360 Ohms resistors to protect them.
+You can add a red LED connected to D12 (Writing) and a green LED connected to D13 (Reading) to have real time information from the board itself. Use 360 Ohms resistors to protect them.
 
 ![](/Pictures/Mega_and_shields.JPG)
 
