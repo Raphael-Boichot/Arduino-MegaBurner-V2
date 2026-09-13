@@ -6,7 +6,7 @@ An Arduino Mega 2560-based programmer for 3.3V parallel flash/EPROM chips used i
 
 ## 1. Origin
 
-I've made this project because I had an urgent need to read / write the three chips supported here for a [Neo Geo bootleg project](https://github.com/Raphael-Boichot/Neo-Geo-Sengoku-2-Red-Blood). Using a [Sanni Cartreader](https://github.com/sanni/cartreader) was an option but not for me: too complicated.
+I've made this project because I had an urgent need to read / write the three chips supported here for a [Neo Geo bootleg project](https://github.com/Raphael-Boichot/Neo-Geo-Sengoku-2-Red-Blood). Using a [Sanni Cartreader](https://github.com/sanni/cartreader) was an option but not for me: too complicated (it does everything fine but requires too much adapters / configuration).
 
 This project originates from [maximaas/MegaBurner](https://github.com/maximaas/MegaBurner), a simple Java + SWT desktop application built to flash the MX29L3211 chip for SNES/SFC cartridge reproductions, talking to an Arduino Mega 2560 over serial. The original Java/Arduino codebase has a hell of outdated dependencies and is not portable at all. So:
 
