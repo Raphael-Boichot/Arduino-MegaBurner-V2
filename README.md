@@ -8,7 +8,7 @@ An Arduino Mega 2560-based programmer for 3.3V parallel flash/EPROM chips used i
 
 I've made this project because I had an urgent need to read / write the three chips supported here for a [Neo Geo bootleg project](https://github.com/Raphael-Boichot/Neo-Geo-Sengoku-2-Red-Blood). Using a [Sanni Cartreader](https://github.com/sanni/cartreader) was an option but not for me: too complicated (it does everything fine but requires too much adapters / configuration).
 
-This project originates from [maximaas/MegaBurner](https://github.com/maximaas/MegaBurner), a simple Java + SWT desktop application built to flash the MX29L3211 chip for SNES/SFC cartridge reproductions, talking to an Arduino Mega 2560 over serial. The original Java/Arduino codebase has a hell of outdated dependencies and is not portable at all. So:
+This project originates from the more straightforward [maximaas/MegaBurner](https://github.com/maximaas/MegaBurner), a Java + SWT desktop application built to flash specifically the MX29L3211 chip for SNES/SFC cartridge reproductions, talking to an Arduino Mega 2560 over serial. The original Java/Arduino codebase has however a hell of outdated dependencies and is not portable at all due to the libraries required for the GUI. So:
 
 - **I translated the Java host application into the simpliest possible Python code** — a small, dependency-light (`pyserial` only) command-line driver and a couple of ready-to-run scripts, replacing the SWT GUI app.
 - **I expanded chip support for my needs** beyond the original single MX29L3211 target, adding the MX29LV320E (Top-Boot and Bottom-Boot) and the MX26L6420, each verified against its own datasheet rather than assumed to behave like the others — they don't always agree on unlock addresses, program granularity, reset sequences, or even bus width quirks, and a few real bugs (busy-polling, hardware pin-swap workarounds) turned up along the way.
@@ -99,7 +99,9 @@ python dump_chip.py
 python full_cycle_chip.py
 ```
 
-Both scripts create their output files (ROM dumps, readback files) next to the script itself, regardless of what folder you launched Python from. The code is voluntarily "script only" to keep the project as much portable as possible.
+I strongly recommend running and editing scripts from VScode. Both scripts create their output files (ROM dumps, readback files) next to the script itself, regardless of what folder you launched Python from. The code is voluntarily "script only" to keep the project as much portable as possible.
+
+The code is very slow due to the way the serial is used but who cares: it works !
 
 ### Adding a chip to the Python side
 
