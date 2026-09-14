@@ -36,16 +36,25 @@ class MX29LV320E : public FlashChip {
 	void readId();
 	void reset();
 	void read8(long block_id, long block_size);
-	void write8(long offset, long page_size, long block_size, byte data[]);
+	bool write8(long offset, long page_size, long block_size, byte data[]);
 	void read16(long block_id, long block_size);
-	void write16(long offset, long page_size, long block_size, byte data[]);
-	void erase();
+	bool write16(long offset, long page_size, long block_size, byte data[]);
+	bool erase();
 
   private:
     // Unlock addresses for this chip family (word mode). See Table 3,
     // "MX29LV320E T/B COMMAND DEFINITIONS" in the datasheet.
     static const unsigned long UNLOCK_ADDR_1 = 0x555;
     static const unsigned long UNLOCK_ADDR_2 = 0x2AA;
+
+    // Generous timeouts so a genuinely-stuck operation (e.g. trying to
+    // reprogram a cell that can't reach its target value, which can
+    // never actually finish) reports failure within a bounded time
+    // instead of hanging the Arduino forever, requiring a manual reset.
+    // Both are far above any legitimate operation's real duration -
+    // this should never fire on healthy hardware.
+    static const unsigned long PAGE_TIMEOUT_MS = 1000;      // per page/word program
+    static const unsigned long ERASE_TIMEOUT_MS = 120000;   // whole-chip erase (~50s max per spec)
 
     // Switch data pins to write
     void dataOut() {
@@ -183,8 +192,15 @@ class MX29LV320E : public FlashChip {
     // to match the target value AND DQ6 to have stopped toggling (two
     // consecutive identical reads) before exiting is the standard,
     // robust combination and fixes that corruption.
-    void busyCheck(unsigned long address, word expectedData) {
+    //
+    // timeoutMs: if neither condition is ever satisfied (e.g. the
+    // target data is physically impossible to reach, such as trying
+    // to set a bit back to 1 without erasing first), this gives up
+    // after timeoutMs and returns false instead of looping forever.
+    bool busyCheck(unsigned long address, word expectedData, unsigned long timeoutMs) {
       dataIn();
+      unsigned long start = millis();
+      bool ok = true;
       word prevReg = readWord(address);
       while (true) {
         word curReg = readWord(address);
@@ -193,11 +209,16 @@ class MX29LV320E : public FlashChip {
         if (dq7Match && dq6Stable) {
           break;
         }
+        if (millis() - start > timeoutMs) {
+          ok = false;
+          break;
+        }
         prevReg = curReg;
       }
 
       // Set data pins to output
       dataOut();
+      return ok;
     }
 };
 

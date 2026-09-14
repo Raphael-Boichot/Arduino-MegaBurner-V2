@@ -111,7 +111,7 @@ void MX29L3211::read16(long block_id, long block_size) {
 	}
 }
 
-void MX29L3211::erase() {
+bool MX29L3211::erase() {
   // Set data pins to output
   dataOut();
 
@@ -126,10 +126,10 @@ void MX29L3211::erase() {
   // Set data pins to input again
   dataIn();
 
-  busyCheck();
+  return busyCheck(ERASE_TIMEOUT_MS);
 }
 
-void MX29L3211::write8(long offset, long page_size, long block_size, byte data[]) {
+bool MX29L3211::write8(long offset, long page_size, long block_size, byte data[]) {
 
 	// Set data pins to output
 	dataOut();
@@ -138,7 +138,10 @@ void MX29L3211::write8(long offset, long page_size, long block_size, byte data[]
 	for (long bi = 0; bi < block_size; bi+=page_size) {
 		// Check if write is complete
 		delayMicroseconds(100);
-		busyCheck();
+		if (!busyCheck(PAGE_TIMEOUT_MS)) {
+			dataIn();
+			return false;
+		}
 
 		// Write command sequence
 		writeWord(0x5555, 0xaa);
@@ -156,12 +159,13 @@ void MX29L3211::write8(long offset, long page_size, long block_size, byte data[]
 
 	// Check if write is complete
 	delayMicroseconds(100);
-	busyCheck();
+	bool ok = busyCheck(PAGE_TIMEOUT_MS);
 	// Set data pins to input again
 	dataIn();
+	return ok;
 }
 
-void MX29L3211::write16(long offset, long page_size, long block_size, byte data[]) {
+bool MX29L3211::write16(long offset, long page_size, long block_size, byte data[]) {
 
 	// Set data pins to output
 	dataOut();
@@ -170,7 +174,10 @@ void MX29L3211::write16(long offset, long page_size, long block_size, byte data[
 	for (long bi = 0; bi < block_size/2; bi+=page_size/2) {
 		// Check if write is complete
 		delayMicroseconds(100);
-		busyCheck();
+		if (!busyCheck(PAGE_TIMEOUT_MS)) {
+			dataIn();
+			return false;
+		}
 
 		// Write command sequence
 		writeWord(0x5555, 0xaa);
@@ -190,7 +197,8 @@ void MX29L3211::write16(long offset, long page_size, long block_size, byte data[
 
 	// Check if write is complete
 	delayMicroseconds(100);
-	busyCheck();
+	bool ok = busyCheck(PAGE_TIMEOUT_MS);
 	// Set data pins to input again
 	dataIn();
+	return ok;
 }

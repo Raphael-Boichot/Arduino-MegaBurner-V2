@@ -59,6 +59,9 @@ class MegaBurner:
     SELECT_COMMAND = "S"
     SIGNAL_BEGIN = ord("&")
     SIGNAL_END = ord("%")
+    SIGNAL_FAIL = ord("!")  # chip reported "never completed" (see busyCheck() timeout
+                              # in the Arduino firmware) - distinct from SIGNAL_END so a
+                              # real failure can't be mistaken for success
 
     def __init__(
         self,
@@ -211,7 +214,11 @@ class MegaBurner:
             self._ser.timeout = old_timeout
 
     def _wait_for_signal(
-        self, sig: int, max_wait: float, on_tick: Optional[Callable[[], None]] = None
+        self,
+        sig: int,
+        max_wait: float,
+        on_tick: Optional[Callable[[], None]] = None,
+        fail_sig: Optional[int] = None,
     ) -> None:
         """Block byte-by-byte until `sig` is received, discarding
         anything else (matches SerialHelper.wait4Signal(), which also
@@ -222,6 +229,14 @@ class MegaBurner:
         `on_tick`, if given, is called roughly every 0.5s while waiting
         - lets a caller drive a spinner during long blocking waits
         (e.g. erase) without needing threads.
+
+        `fail_sig`, if given, is a second byte value that - if seen -
+        raises immediately with a clear "the device reported failure"
+        message, instead of being treated as a stray/ignorable byte.
+        Used for SIGNAL_FAIL, which the firmware sends when its own
+        internal busyCheck() timeout fires (see erase()/write() in
+        this class) - this is a real, reported failure, not noise to
+        skip past.
         """
         assert self._ser is not None
         deadline = time.monotonic() + max_wait
@@ -236,6 +251,12 @@ class MegaBurner:
                         print(f"[DEBUG RX] {b!r} (0x{b[0]:02X})")
                     if b[0] == sig:
                         return
+                    if fail_sig is not None and b[0] == fail_sig:
+                        raise CommException(
+                            "Device reported that the operation failed (its internal "
+                            "busy-check timed out - the chip never reported completion). "
+                            "Data may be incomplete or corrupted at this point."
+                        )
                     stray += b
                 if on_tick:
                     on_tick()
@@ -291,7 +312,9 @@ class MegaBurner:
         self._flush_input()
 
         self._write_cmd_bytes(self.ERASE_COMMAND)
-        self._wait_for_signal(self.SIGNAL_END, self.timeouts.erase_signal, on_tick=on_tick)
+        self._wait_for_signal(
+            self.SIGNAL_END, self.timeouts.erase_signal, on_tick=on_tick, fail_sig=self.SIGNAL_FAIL
+        )
 
     def write(self, data: bytes, progress: Optional[ProgressFn] = None) -> None:
         """Write `data` to the chip starting at offset 0."""
@@ -315,7 +338,7 @@ class MegaBurner:
                 print(f"[DEBUG TX] sent {n_sent}/{write_count} data bytes for block at "
                       f"offset {i} in {time.monotonic() - t0:.3f}s")
 
-            self._wait_for_signal(self.SIGNAL_END, self.timeouts.write_signal)
+            self._wait_for_signal(self.SIGNAL_END, self.timeouts.write_signal, fail_sig=self.SIGNAL_FAIL)
 
             i += write_count
             if progress:

@@ -20,12 +20,21 @@ class MX29L3211 : public FlashChip {
 	void readId();
 	void reset();
 	void read8(long block_id, long block_size);
-	void write8(long offset, long page_size, long block_size, byte data[]);
+	bool write8(long offset, long page_size, long block_size, byte data[]);
 	void read16(long block_id, long block_size);
-	void write16(long offset, long page_size, long block_size, byte data[]);
-	void erase();
+	bool write16(long offset, long page_size, long block_size, byte data[]);
+	bool erase();
 
   private:
+    // Generous timeouts so a genuinely-stuck operation (e.g. trying to
+    // reprogram a cell that can't reach its target value, which can
+    // never actually finish) reports failure within a bounded time
+    // instead of hanging the Arduino forever, requiring a manual reset.
+    // Both are far above any legitimate operation's real duration -
+    // this should never fire on healthy hardware.
+    static const unsigned long PAGE_TIMEOUT_MS = 1000;      // per page/word program
+    static const unsigned long ERASE_TIMEOUT_MS = 120000;   // whole-chip erase (~90s max per spec)
+
     // Switch data pins to write
     void dataOut() {
       DDRC = 0xFF;
@@ -149,16 +158,23 @@ class MX29L3211 : public FlashChip {
       return readWord(0);
     }
 
-    void busyCheck() {
+    bool busyCheck(unsigned long timeoutMs) {
       // Read the status register
       word statusReg = readStatusReg();
+      unsigned long start = millis();
+      bool ok = true;
 
       while ((statusReg | 0xFF7F) != 0xFFFF) {
+        if (millis() - start > timeoutMs) {
+          ok = false;
+          break;
+        }
         statusReg = readWord(0);
       }
 
       // Set data pins to output
       dataOut();
+      return ok;
     }
 };
 

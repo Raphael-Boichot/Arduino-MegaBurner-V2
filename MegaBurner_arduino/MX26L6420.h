@@ -89,12 +89,23 @@ class MX26L6420 : public FlashChip {
 	void readId();
 	void reset();
 	void read16(long block_id, long block_size);
-	void write16(long offset, long page_size, long block_size, byte data[]);
-	void erase();
+	bool write16(long offset, long page_size, long block_size, byte data[]);
+	bool erase();
 
   private:
     static const unsigned long UNLOCK_ADDR_1 = 0x555;
     static const unsigned long UNLOCK_ADDR_2 = 0x2AA;
+
+    // Generous timeouts so a genuinely-stuck operation (e.g. trying to
+    // reprogram a cell that can't reach its target value, which can
+    // never actually finish - a real scenario for this chip with a
+    // partially-disabled A21 line, see the project README) reports
+    // failure within a bounded time instead of hanging the Arduino
+    // forever, requiring a manual reset. Both are far above any
+    // legitimate operation's real duration - this should never fire
+    // on healthy hardware/addressing.
+    static const unsigned long PAGE_TIMEOUT_MS = 1000;      // per page/word program
+    static const unsigned long ERASE_TIMEOUT_MS = 120000;   // whole-chip erase
 
     // Switch data pins to write
     void dataOut() {
@@ -189,8 +200,14 @@ class MX26L6420 : public FlashChip {
     // "done" a moment before the word has actually fully settled (bit
     // 6, the DQ6 "Toggle Bit", may still be toggling) - requiring both
     // to agree is the standard, robust combination.
-    void busyCheck(unsigned long address, word expectedData) {
+    //
+    // timeoutMs: if neither condition is ever satisfied (e.g. the
+    // target data is physically impossible to reach), this gives up
+    // after timeoutMs and returns false instead of looping forever.
+    bool busyCheck(unsigned long address, word expectedData, unsigned long timeoutMs) {
       dataIn();
+      unsigned long start = millis();
+      bool ok = true;
       word prevReg = readWord(address);
       while (true) {
         word curReg = readWord(address);
@@ -199,9 +216,14 @@ class MX26L6420 : public FlashChip {
         if (dq7Match && dq6Stable) {
           break;
         }
+        if (millis() - start > timeoutMs) {
+          ok = false;
+          break;
+        }
         prevReg = curReg;
       }
       dataOut();
+      return ok;
     }
 };
 

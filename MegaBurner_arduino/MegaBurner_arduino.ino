@@ -95,9 +95,14 @@ void erase() {
 	digitalWrite(WRITE_LED_PIN, HIGH);
 
 	activeChip->reset();
-	activeChip->erase();
+	bool ok = activeChip->erase();
 
-	Serial.println('%');
+	// '%' = success, '!' = the chip never reported completion within
+	// a sane timeout (see busyCheck() in the active chip driver) -
+	// distinct from '%' so the host can tell a real failure apart from
+	// a successful operation, rather than either hanging forever or
+	// silently reporting success on a failed erase.
+	Serial.println(ok ? '%' : '!');
 
 	digitalWrite(WRITE_LED_PIN, LOW);
 }
@@ -129,8 +134,10 @@ void write(String param) {
 	if (block_size < page_size)
 		page_size = block_size;
 
-    activeChip->write16(offset, page_size, block_size, buffer);
-    Serial.println('%');
+    bool ok = activeChip->write16(offset, page_size, block_size, buffer);
+    // '%' = success, '!' = the chip never reported completion within
+    // a sane timeout (see busyCheck() in the active chip driver).
+    Serial.println(ok ? '%' : '!');
 
 	delay(100);
 	activeChip->reset();

@@ -23,8 +23,11 @@ class FlashChip {
 	virtual void readId() = 0;
 	virtual void reset() = 0;
 	virtual void read16(long block_id, long block_size) = 0;
-	virtual void write16(long offset, long page_size, long block_size, byte data[]) = 0;
-	virtual void erase() = 0;
+	// write16()/erase() return false if the chip never reported
+	// "operation complete" within a sane timeout (instead of hanging
+	// the Arduino forever) - see busyCheck() in each chip driver.
+	virtual bool write16(long offset, long page_size, long block_size, byte data[]) = 0;
+	virtual bool erase() = 0;
 
 	// Base classes with virtual functions need a virtual destructor,
 	// even though these chip objects are never actually deleted (they're

@@ -115,7 +115,7 @@ void MX29LV320E::read16(long block_id, long block_size) {
 	}
 }
 
-void MX29LV320E::erase() {
+bool MX29LV320E::erase() {
   // Set data pins to output
   dataOut();
 
@@ -133,10 +133,10 @@ void MX29LV320E::erase() {
   // Chip erase affects the whole array, so address 0 is always a
   // valid address to poll here (unlike write, see write16() below).
   // Erased state is all-1s (0xFFFF), so that's the expected result.
-  busyCheck(0, 0xFFFF);
+  return busyCheck(0, 0xFFFF, ERASE_TIMEOUT_MS);
 }
 
-void MX29LV320E::write8(long offset, long page_size, long block_size, byte data[]) {
+bool MX29LV320E::write8(long offset, long page_size, long block_size, byte data[]) {
 
 	// Set data pins to output
 	dataOut();
@@ -150,7 +150,10 @@ void MX29LV320E::write8(long offset, long page_size, long block_size, byte data[
 		// being programmed (the last byte written), against the value
 		// actually written there (not a fixed address/value).
 		delayMicroseconds(100);
-		busyCheck(lastAddress, lastData);
+		if (!busyCheck(lastAddress, lastData, PAGE_TIMEOUT_MS)) {
+			dataIn();
+			return false;
+		}
 
 		// Write command sequence
 		writeWord(UNLOCK_ADDR_1, 0xaa);
@@ -169,12 +172,13 @@ void MX29LV320E::write8(long offset, long page_size, long block_size, byte data[
 
 	// Check if write is complete
 	delayMicroseconds(100);
-	busyCheck(lastAddress, lastData);
+	bool ok = busyCheck(lastAddress, lastData, PAGE_TIMEOUT_MS);
 	// Set data pins to input again
 	dataIn();
+	return ok;
 }
 
-void MX29LV320E::write16(long offset, long page_size, long block_size, byte data[]) {
+bool MX29LV320E::write16(long offset, long page_size, long block_size, byte data[]) {
 
 	// Set data pins to output
 	dataOut();
@@ -189,7 +193,10 @@ void MX29LV320E::write16(long offset, long page_size, long block_size, byte data
 		// being programmed (the last word written), against the value
 		// actually written there (not a fixed address/value).
 		delayMicroseconds(100);
-		busyCheck(lastAddress, lastData);
+		if (!busyCheck(lastAddress, lastData, PAGE_TIMEOUT_MS)) {
+			dataIn();
+			return false;
+		}
 
 		// Write command sequence
 		writeWord(UNLOCK_ADDR_1, 0xaa);
@@ -211,7 +218,8 @@ void MX29LV320E::write16(long offset, long page_size, long block_size, byte data
 
 	// Check if write is complete
 	delayMicroseconds(100);
-	busyCheck(lastAddress, lastData);
+	bool ok = busyCheck(lastAddress, lastData, PAGE_TIMEOUT_MS);
 	// Set data pins to input again
 	dataIn();
+	return ok;
 }
