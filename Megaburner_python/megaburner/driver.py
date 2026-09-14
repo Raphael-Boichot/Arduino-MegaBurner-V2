@@ -41,8 +41,9 @@ class Timeouts:
                                       # flash + startup chip-ID read + reset settle, ~1.6s)
     block_read: float = 10.0         # per serial.read() call while pulling a read/verify block
     check_id: float = 5.0            # waiting for the 4 id bytes
-    erase_signal: float = 300.0      # waiting for '%' after erase (chip erase can be slow -
-                                      # bump further if your chip genuinely needs longer)
+    erase_signal: float = 660.0      # waiting for '%'/'!' after erase - must stay above the
+                                      # Arduino-side ERASE_TIMEOUT_MS (600s) so the firmware's
+                                      # clearer failure report has a chance to arrive first
     write_signal: float = 20.0       # waiting for '&' or '%' around each write block
     select_signal: float = 10.0      # waiting for '%' after selecting a chip (runs that
                                       # chip's init(), which includes an id-read + reset)

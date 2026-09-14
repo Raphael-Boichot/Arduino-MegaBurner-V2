@@ -54,7 +54,7 @@ class MX29LV320E : public FlashChip {
     // Both are far above any legitimate operation's real duration -
     // this should never fire on healthy hardware.
     static const unsigned long PAGE_TIMEOUT_MS = 1000;      // per page/word program
-    static const unsigned long ERASE_TIMEOUT_MS = 120000;   // whole-chip erase (~50s max per spec)
+    static const unsigned long ERASE_TIMEOUT_MS = 600000;    // whole-chip erase (generous margin above ~50s spec)
 
     // Switch data pins to write
     void dataOut() {

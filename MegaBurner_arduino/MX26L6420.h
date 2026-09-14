@@ -105,7 +105,7 @@ class MX26L6420 : public FlashChip {
     // legitimate operation's real duration - this should never fire
     // on healthy hardware/addressing.
     static const unsigned long PAGE_TIMEOUT_MS = 1000;      // per page/word program
-    static const unsigned long ERASE_TIMEOUT_MS = 120000;   // whole-chip erase
+    static const unsigned long ERASE_TIMEOUT_MS = 600000;   // whole-chip erase
 
     // Switch data pins to write
     void dataOut() {
