@@ -57,22 +57,27 @@
  * used to be.
  *
  * Consequence: on this adapter, the Arduino's normal WE#-drive pin
- * (PH4) reaches socket pin 1, which is MX26L6420's A21 - not WE# at
+ * (PH4/D7) reaches socket pin 1, which is MX26L6420's A21 - not WE# at
  * all. Meanwhile socket pin 33 - this chip's REAL WE# - receives
- * whatever the Arduino drives for "BYTE#" (PH3), which every other
+ * whatever the Arduino drives for "BYTE#" (PH3/D6), which every other
  * chip driver holds permanently HIGH and never toggles. A WE# line
  * that never pulses means the chip can never latch a write command -
  * this was the actual root cause of check()/erase() getting no
  * response at all, even though plain reads worked fine (reads don't
  * involve WE# at all).
  *
- * Rather than requiring a hardware rewire, this class compensates in
- * software: writeWord() below pulses PH3 (physically wired to socket
- * pin 33, this chip's real WE#) instead of PH4. PH4 is left alone -
- * it reaches socket pin 1 (A21), which is separately tied to GND
- * outside the Arduino's control anyway (see the A21 discussion
- * elsewhere in this project - the chip is limited to its lower 4MB
- * bank as a result, which is a known, accepted limitation, not a bug).
+ * This class compensates for both halves of the swap in software,
+ * with no hardware rewire needed:
+ *   - writeWord() pulses PH3/D6 (this chip's real WE#) instead of PH4.
+ *   - PH4/D7 - now free, since it's no longer used for WE# on this
+ *     chip - is repurposed to drive the A21 address bit instead (see
+ *     the A21 bit-banging in writeWord()/readByte()/readWord() below).
+ *     The address math already computes A21 correctly as part of the
+ *     normal 24-bit address value; this adapter's own A21 line (which
+ *     would normally be PORTL bit 5, Arduino D44) simply isn't wired
+ *     to any socket pin on this board, so the correctly-computed bit
+ *     is sent out via PH4/D7 instead - same electrical signal,
+ *     different physical pin, no new wiring required.
  */
 #ifndef MX26L6420_h
 #define MX26L6420_h
@@ -123,6 +128,19 @@ class MX26L6420 : public FlashChip {
       PORTF = address & 0xFF;
       PORTK = (address >> 8) & 0xFF;
       PORTL = (address >> 16) & 0xFF;
+      // A21 bit -> PORTH bit 4 (Arduino D7). See the "A21 pin
+      // repurposing" note in the class comment above: this chip's
+      // real A21 pin is wired, via this project's shared adapter, to
+      // D7/PH4 - a control-line pin not otherwise needed for this
+      // chip (it was "WE#" for the other two chip drivers). PORTL's
+      // own bit 5 also carries the correct A21 value, but that pin
+      // (D44) isn't wired to any socket pin on this adapter at all -
+      // this is the pin that's actually connected.
+      if (address & (1UL << 21)) {
+        PORTH |= (1 << 4);
+      } else {
+        PORTH &= ~(1 << 4);
+      }
       PORTC = data;
       PORTA = (data >> 8) & 0xFF;
 
@@ -132,10 +150,11 @@ class MX26L6420 : public FlashChip {
 
       // Pulse WE# LOW - PH3, NOT PH4! See the WE#/A21 pin-swap note
       // in the class comment above: PH3 is physically wired to socket
-      // pin 33, which is this chip's real WE#. PH4 (the "normal" WE#
-      // pin used by the other two chip drivers) reaches socket pin 1,
-      // which on THIS chip is A21, not WE# - toggling PH4 here would
-      // do nothing useful.
+      // pin 33, this chip's real WE#. PH4 (the "normal" WE# pin used
+      // by the other two chip drivers) reaches socket pin 1, which on
+      // THIS chip is A21 - it's already been set correctly above as
+      // part of the address, and must NOT be touched here or it would
+      // corrupt the address mid-cycle.
       PORTH &= ~(1 << 3);
 
       // Leave WE low for at least 60ns
@@ -152,6 +171,14 @@ class MX26L6420 : public FlashChip {
       PORTF = address & 0xFF;
       PORTK = (address >> 8) & 0xFF;
       PORTL = (address >> 16) & 0xFF;
+      // A21 bit -> PORTH bit 4 (Arduino D7) - see writeWord() above
+      // for why this chip's A21 goes out through this pin instead of
+      // PORTL's own (unwired, on this adapter) bit 5.
+      if (address & (1UL << 21)) {
+        PORTH |= (1 << 4);
+      } else {
+        PORTH &= ~(1 << 4);
+      }
 
       // Arduino running at 16Mhz -> one nop = 62.5ns
       __asm__("nop\n\t");
@@ -175,6 +202,14 @@ class MX26L6420 : public FlashChip {
       PORTF = address & 0xFF;
       PORTK = (address >> 8) & 0xFF;
       PORTL = (address >> 16) & 0xFF;
+      // A21 bit -> PORTH bit 4 (Arduino D7) - see writeWord() above
+      // for why this chip's A21 goes out through this pin instead of
+      // PORTL's own (unwired, on this adapter) bit 5.
+      if (address & (1UL << 21)) {
+        PORTH |= (1 << 4);
+      } else {
+        PORTH &= ~(1 << 4);
+      }
 
       // Arduino running at 16Mhz -> one nop = 62.5ns
       __asm__("nop\n\t");

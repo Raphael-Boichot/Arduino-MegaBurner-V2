@@ -23,7 +23,8 @@ void MX26L6420::init()
 	  // Set Control Pins to Output OE(PH1) CE(PH6), plus PH3 and PH4
 	  // (both need to be outputs regardless of role - see the WE#/A21
 	  // pin-swap note in MX26L6420.h: PH3 is this chip's real WE#,
-	  // PH4 lands on A21 which isn't driven from here at all).
+	  // PH4/D7 carries the A21 address bit instead of its usual role
+	  // on the other chip drivers).
 	  DDRH |=  (1 << 1) | (1 << 3) | (1 << 4) | (1 << 6);
 
 	  // Set Data Pins (D0-D15) to Input
@@ -33,9 +34,11 @@ void MX26L6420::init()
 	  PORTC = 0x00;
 	  PORTA = 0x00;
 
-	  // Setting OE(PH1) HIGH, WE#(PH3) HIGH (idle - see MX26L6420.h),
-	  // and PH4 HIGH (harmless either way, since it doesn't reach a
-	  // control pin on this chip)
+	  // Setting OE(PH1) HIGH, WE#(PH3) HIGH (idle - see MX26L6420.h).
+	  // PH4 also starts HIGH here (A21=1 at power-up), but every
+	  // actual read/write already sets it correctly per-address before
+	  // use (see writeWord()/readByte()/readWord()), so this initial
+	  // value doesn't matter in practice.
 	  PORTH |= (1 << 1) | (1 << 3) | (1 << 4);
 	  // Setting CE(PH6) LOW
 	  PORTH &= ~(1 << 6);
