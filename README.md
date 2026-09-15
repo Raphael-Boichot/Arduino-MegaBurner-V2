@@ -2,6 +2,8 @@
 
 An Arduino Mega 2560-based programmer for 3.3V parallel flash/EPROM chips used in cartridge-repro projects (Neo Geo, SNES/SFC, etc.), controlled from a Python host over serial: check chip ID, erase, write a ROM file, read back, and verify. It can easily be modified to handle other PSOP44 chips as long as they operate at 3.3V only.
 
+**The project is made to be as simple and portable as possible.** There is no fancy GUI, not a ton of options, just the bare necessary features to test / read / burn your chips.
+
 ![](/Pictures/Tower_of_power.jpg)
 
 ## 1. Origin
