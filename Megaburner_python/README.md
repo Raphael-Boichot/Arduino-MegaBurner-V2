@@ -14,13 +14,13 @@ pip install -r requirements.txt
 ```
 (or just `pip install pyserial` — it's the only dependency)
 
-## Quick test (the main thing you asked for)
+## Quick test
 
-Open `test_megaburner.py`, edit the **CONFIGURATION** block at the top
+Open `full_cycle_chip.py`, edit the **CONFIGURATION** block at the top
 (at minimum, set `COM_PORT` to your board's port), then run:
 
 ```
-python test_megaburner.py
+python full_cycle_chip
 ```
 
 It will, in order, with a progress bar/spinner for each step:
