@@ -8,29 +8,29 @@ An Arduino Mega 2560-based programmer for 3.3V parallel flash/EPROM chips used i
 
 ## 1. Origin
 
-I've made this project because I had an urgent need to read / write the three chips supported here for a [Neo Geo bootleg project](https://github.com/Raphael-Boichot/Neo-Geo-Sengoku-2-Red-Blood). Using a [Sanni Cartreader](https://github.com/sanni/cartreader) was an option but not for me: too complicated (it does everything fine but requires too much adapters / configuration).
+I've made this project because I had an urgent need to read / write the three chips supported here for a [Neo Geo bootleg project](https://github.com/Raphael-Boichot/Neo-Geo-Sengoku-2-Red-Blood). Using a [Sanni Cartreader](https://github.com/sanni/cartreader) was an option, this is a great project, but not for me right now: too complicated (it does everything fine but requires too much adapters / configuration).
 
-This project originates from the more straightforward [maximaas/MegaBurner](https://github.com/maximaas/MegaBurner), a Java + SWT desktop application built to flash specifically the MX29L3211 chip for SNES/SFC cartridge reproductions, talking to an Arduino Mega 2560 over serial. The original Java/Arduino codebase has however a hell of outdated dependencies and is not portable at all due to the libraries required for the GUI. So:
+This project originates from the more straightforward [maximaas/MegaBurner](https://github.com/maximaas/MegaBurner), a Java + SWT desktop application built to flash specifically the MX29L3211 chip for SNES/SFC cartridge reproductions, talking to an Arduino Mega 2560 over serial. The original Java / Arduino codebase has however a hell of outdated dependencies (the project was made in 2017) and is not portable at all due to the libraries required for the GUI. After compiling the Java code, I came to the conclusion that I needed something less fancy and easier to debug. So:
 
 - **I translated the Java host application into the simpliest possible Python code** — a small, dependency-light (`pyserial` only) command-line driver and a couple of ready-to-run scripts, replacing the SWT GUI app.
 - **I expanded chip support for my needs** beyond the original single MX29L3211 target, adding the MX29LV320E (Top-Boot and Bottom-Boot) and the MX26L6420, each verified against its own datasheet rather than assumed to behave like the others — they don't always agree on unlock addresses, program granularity, reset sequences, or even bus width quirks, and a few real bugs (busy-polling, hardware pin-swap workarounds) turned up along the way.
 - **I reworked the Arduino firmware** so chip selection happens at **runtime**, over serial, instead of needing a firmware reflash every time you swap chips.
 - **I bullet-proofed the tool chain** with lots of endurance runs on real chips before using it with success.
 
-As it, adding new chips is quite simple.
+As it, adding new chips is quite simple. As I can only add chips that I own for testing, the list is quite restricted for now. 
 
 ## 2. Hardware: the Arduino Mega 3.3V mod
 
-All the chips this project targets are **3V/3.3V parts**. The Arduino Mega 2560 runs its logic at 5V by default, and driving a 3.3V-only flash chip's inputs at 5V is not something to rely on — it's outside the chip's rated I/O voltage. The fix used in this project is to modify the Arduino Mega itself to run at 3.3V, rather than adding external level-shifters.
+All the chips this project targets are **3V/3.3V parts**. The Arduino Mega 2560 runs its logic at 5V by default, and driving a 3.3V-only flash chip inputs at 5V is outside the chip rated I/O voltage. The fix used in this project is to modify the Arduino Mega itself to run at 3.3V, rather than adding external level-shifters.
 
 See the picture below for exactly how this board was modified (Chinese clone here, mod is very easy):
 
 ![Arduino Mega 3.3V mod](Pictures/Arduino_mega_3.3V_mod.png)
 
-If you're using an official product, follow the [Adafruit guide](https://learn.adafruit.com/arduino-tips-tricks-and-techniques/3-3v-conversion) as the voltage regulator is not the same.
+If you're using an official Arduino product, follow the [Adafruit guide](https://learn.adafruit.com/arduino-tips-tricks-and-techniques/3-3v-conversion) as the voltage regulator is not the same. As you can see, I took some shortcuts with my clone as it will basically be used only for a single task.
 
-The usual approach is anyway to bypass/replace the Mega's onboard 5V regulator with a 3.3V one, so every I/O pin - not just some of
-them - runs at the chip-safe voltage. Double check your specific board regulator pinout before doing this swap (mine was the same as the AMS1117 3.3V required here). Running an ATmega2560 at 3.3V has a lower maximum clock frequency than at 5V. It does not affect this project.
+The usual approach is anyway to bypass / replace the Mega onboard 5V regulator with a 3.3V one, so every I/O pin - not just some of
+them - runs at the chip-safe voltage. Double check your specific board regulator pinout before doing this swap (mine was the same as the AMS1117 3.3V required here). Running an ATmega2560 at 3.3V has a lower maximum clock frequency than at 5V. It does not affect this project at all.
 
 Arduino Mega are dirt cheap on second hand market, in particular Chinese clones, so I recommend butchering an old one rather than a new. Mine was sold as "working" with the voltage regulator completely charred, exactly what I needed for the mod.
 
@@ -38,7 +38,7 @@ Arduino Mega are dirt cheap on second hand market, in particular Chinese clones,
 
 ![](/Pictures/SOP44_Pinout.png)
 
-The pinout have nothing particular. It requires lots of spaghetti wiring but it does not justify making a dedicated PCB because wires are cool. Just use a generic Arduino Mega shield and solder.
+Just strictly follow the pinout given here. It requires lots of spaghetti wiring but it does not justify making a dedicated PCB because mess of wires are cool. Just use the cheapest generic Arduino Mega shield and solder.
 
 You can add a red LED connected to D12 (Writing) and a green LED connected to D13 (Reading) to have real time information from the board itself. Use 360 Ohms resistors to protect them.
 
@@ -113,4 +113,4 @@ Add a `Chip(...)` entry to `megaburner/chips.py`. Every field is required and do
 
 - [maximaas](https://github.com/maximaas) for the original [MegaBurner](https://github.com/maximaas/MegaBurner) project this is built on.
 - [sanni](https://github.com/sanni) for the [Cart Reader](https://github.com/sanni/cartreader) and its huge amount of open documentation.
-- Claude AI, without which this project would have taken up far too much of my free time – which has already been the case, given the sheer volume of hardware tests and manual checks that needed to be carried out before releasing this project in the wild.
+- Claude AI, without which this project would have taken up far too much of my free time – which has already been the case, given the sheer volume of hardware tests, feedbacks and manual checks that needed to be carried out before releasing this project in the wild.
