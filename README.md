@@ -4,7 +4,7 @@ An Arduino Mega 2560-based programmer for 3.3V parallel flash/EPROM chips used i
 
 **The project is made to be as simple and portable as possible.** There is no fancy GUI, not a ton of options, just the bare necessary features to test / read / burn your chips.
 
-List of supported chips to date:
+List of chips supported to date:
 - MX29L3211 @PSOP44
 - MX29LV320 @PSOP44
 - MX26L6420 @PSOP44
