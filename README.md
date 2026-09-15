@@ -9,6 +9,8 @@ List of chips supported to date:
 - MX29LV320 @PSOP44
 - MX26L6420 @PSOP44
 
+As I can only add chips that I own for testing, the list is basically restricted to my needs for now. 
+
 ![](/Pictures/Tower_of_power.jpg)
 
 ## 1. Origin
@@ -22,7 +24,7 @@ This project originates from the more straightforward [maximaas/MegaBurner](http
 - **I reworked the Arduino firmware** so chip selection happens at **runtime**, over serial, instead of needing a firmware reflash every time you swap chips.
 - **I bullet-proofed the tool chain** with lots of endurance runs on real chips before using it with success.
 
-As it, adding new chips is quite simple. As I can only add chips that I own for testing, the list is quite restricted for now. 
+As it, adding new chips is quite simple. 
 
 ## 2. Hardware: the Arduino Mega 3.3V mod
 
