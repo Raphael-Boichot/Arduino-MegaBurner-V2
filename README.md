@@ -45,7 +45,7 @@ Arduino Mega are dirt cheap on second hand market, in particular Chinese clones,
 
 ![](/Pictures/Arduino_Mega_2560_Rev3_pinout.png)
 
-Non (A) Analog pins are (D) digital pins.
+Take VCC on the +5V, it is now 3.3V.
 
 ![](/Pictures/SOP44_Pinout.png)
 
