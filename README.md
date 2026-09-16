@@ -43,6 +43,7 @@ Arduino Mega are dirt cheap on second hand market, in particular Chinese clones,
 
 ## 3. Hardware: crafting the device
 
+![](/Pictures/Arduino_Mega_2560_Rev3_pinout.png)
 ![](/Pictures/SOP44_Pinout.png)
 
 Just strictly follow the pinout given here. It requires lots of spaghetti wiring but it does not justify making a dedicated PCB because mess of wires are cool. Just use the cheapest generic Arduino Mega shield and solder.
