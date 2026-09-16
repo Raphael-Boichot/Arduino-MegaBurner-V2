@@ -13,7 +13,7 @@ As I can only add chips that I own for testing, the list is basically restricted
 
 ![](/Pictures/Tower_of_power.jpg)
 
-## 1. Origin
+## 1. Origin: make it simple
 
 I've made this project because I had an urgent need to read / write the three chips supported here for a [Neo Geo bootleg project](https://github.com/Raphael-Boichot/Neo-Geo-Sengoku-2-Red-Blood). Using a [Sanni Cartreader](https://github.com/sanni/cartreader) was an option, this is a great project, but not for me right now: too complicated (it does everything fine but requires too much adapters / configuration).
 
