@@ -30,7 +30,16 @@ from megaburner.progress import ProgressBar
 # CONFIGURATION - edit these, then just run the script.
 # ============================================================
 
-COM_PORT = "COM6"              # e.g. "COM5" on Windows, "/dev/ttyACM0" on Linux
+# Leave AUTODETECT_PORT = True to find the Arduino automatically: the
+# script pings every available serial port and picks the one that
+# identifies itself as a MegaBurner. Set it to False to always use
+# COM_PORT below instead (useful if you have several MegaBurners
+# connected, or just want a fixed, predictable port).
+AUTODETECT_PORT = True
+
+# Used when AUTODETECT_PORT is False, or as a fallback if autodetection
+# finds nothing. e.g. "COM5" on Windows, "/dev/ttyACM0" on Linux.
+COM_PORT = "COM6"
 # Uncomment exactly ONE of the lines below (must match megaburner/chips.py)
 ##CHIP_NAME = "MX29L3211"        # 32Mbit, 3.3V flash, page-buffer program
 # CHIP_NAME = "MX29LV320ET"      # 32Mbit, 3V flash, SOP44, Top-Boot
@@ -81,26 +90,51 @@ def fail(message: str) -> None:
     sys.exit(1)
 
 
-def main() -> None:
-    overall_start = time.monotonic()
+def resolve_port(available: list) -> str:
+    """Decide which serial port to use, honouring AUTODETECT_PORT."""
+    if AUTODETECT_PORT:
+        print("Autodetecting the MegaBurner (pinging each port)...")
 
-    hr("MegaBurner - check ID, read, save")
-    print(f"Script folder : {SCRIPT_DIR}")
-    print(f"Port          : {COM_PORT}")
-    print(f"Chip          : {CHIP_NAME}")
+        def show_probe(p: str) -> None:
+            print(f"  probing {p} ...")
 
-    # ------------------------------------------------------------------
-    # Step 0: list available ports
-    # ------------------------------------------------------------------
-    hr("Step 0/3: Checking USB/serial ports")
-    available = MegaBurner.list_ports()
-    print("Available ports:", ", ".join(available) if available else "(none found)")
+        found = MegaBurner.autodetect_port(debug=DEBUG, on_probe=show_probe)
+        if found:
+            print(f"Found MegaBurner on {found}.")
+            return found
+        print(
+            f"No MegaBurner answered the ping. Falling back to COM_PORT ({COM_PORT}).\n"
+            "If that fails, check the board is plugged in and running firmware that\n"
+            "supports the ping command, or set AUTODETECT_PORT = False and pick the\n"
+            "port manually."
+        )
+        return COM_PORT
+
     if COM_PORT not in available:
         print(
             f"WARNING: {COM_PORT} was not in the list above. It may still work "
             "(some ports don't always enumerate), but double-check the port name "
             "if the next step fails."
         )
+    return COM_PORT
+
+
+def main() -> None:
+    overall_start = time.monotonic()
+
+    hr("MegaBurner - check ID, read, save")
+    print(f"Script folder : {SCRIPT_DIR}")
+    print(f"Port          : {'autodetect' if AUTODETECT_PORT else COM_PORT}")
+    print(f"Chip          : {CHIP_NAME}")
+
+    # ------------------------------------------------------------------
+    # Step 0: find the board
+    # ------------------------------------------------------------------
+    hr("Step 0/3: Checking USB/serial ports")
+    available = MegaBurner.list_ports()
+    print("Available ports:", ", ".join(available) if available else "(none found)")
+
+    port = resolve_port(available)
 
     mb = MegaBurner(CHIP_NAME, debug=DEBUG)
 
@@ -109,8 +143,8 @@ def main() -> None:
         # Step 1: connect (this also selects CHIP_NAME on the firmware)
         # ------------------------------------------------------------------
         hr("Step 1/3: Connecting")
-        mb.connect(COM_PORT)
-        print(f"Connected to {COM_PORT}.")
+        mb.connect(port)
+        print(f"Connected to {port}.")
 
         # ------------------------------------------------------------------
         # Step 2: check chip ID

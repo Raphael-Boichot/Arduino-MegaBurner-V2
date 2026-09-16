@@ -17,7 +17,8 @@ pip install -r requirements.txt
 ## Quick test
 
 Open `full_cycle_chip.py`, edit the **CONFIGURATION** block at the top
-(at minimum, set `COM_PORT` to your board's port), then run:
+(at minimum, set `CHIP_NAME` to the chip you're using — the serial port
+is found automatically by default, see "Finding the board" below), then run:
 
 ```
 python full_cycle_chip
@@ -25,7 +26,7 @@ python full_cycle_chip
 
 It will, in order, with a progress bar/spinner for each step:
 
-1. List available serial ports (sanity check).
+1. List available serial ports, and find the board automatically by pinging them.
 2. Connect.
 3. Check the chip ID against what's expected for `CHIP_NAME`.
 4. Erase the whole chip.
@@ -47,6 +48,29 @@ responding partway through, the script fails with a clear error message
 instead of hanging forever — important since the whole point is to be
 able to walk away and come back later.
 
+## Finding the board (serial port autodetection)
+
+Both scripts default to `AUTODETECT_PORT = True`. On startup they send a
+ping command (`P`) to every available serial port and use the first one
+that answers with `megaburner` — so you normally never have to know or
+configure a COM port.
+
+The ping is deliberately a standalone command that never touches the
+chip, so probing ports that belong to other devices is harmless in both
+directions. Ports that are busy, permission-denied, silent, or that reply
+with something else are simply skipped.
+
+Set `AUTODETECT_PORT = False` to skip all that and always use `COM_PORT`
+— useful if you have several MegaBurners plugged in, or just want a fixed
+and predictable port. If autodetection is on but finds nothing, the
+scripts fall back to `COM_PORT` anyway and tell you so.
+
+Autodetection needs firmware that supports the `P` command. If you're
+running an older sketch, either reflash or set `AUTODETECT_PORT = False`.
+
+In code, this is available as `MegaBurner.autodetect_port()` (returns a
+port name or `None`) and `MegaBurner.ping_port(port)` (returns a bool).
+
 ## Project layout
 
 | File                     | Purpose                                              |
@@ -56,7 +80,7 @@ able to walk away and come back later.
 | `megaburner/fileio.py`     | Load/save ROM files, random test-data generator.       |
 | `megaburner/progress.py`   | Plain stdlib console progress bar + spinner (no extra deps). |
 | `megaburner/exceptions.py` | `CommException`.                                       |
-| `test_megaburner.py`       | Full round-trip test: check → erase → write → read back → CRC32. |
+| `full_cycle_chip.py`       | Full round-trip test: check → erase → write → read back → CRC32. |
 | `dump_chip.py`             | Read-only: check → read → save. No erase, no write — safe for a first look at an unfamiliar chip, or just backing up a cart. |
 
 ## Using the driver directly (for your own scripts later)
@@ -143,3 +167,4 @@ for MX29L3211.
 | `E`                    | Erase whole chip                                            | `%` when done (can take a while) |
 | `W<offset>,<page>,<n>`  | Write `n` bytes at `offset`                                 | `&` when ready, then `n` raw bytes are sent, then `%` when done |
 | `S<name>`              | Select active chip driver (e.g. `SMX26L6420`)               | `%` once that chip's init() (id-read + reset) completes |
+| `P`                    | Ping / identify the board                                   | `megaburner` — used for port autodetection; never touches the chip |

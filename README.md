@@ -59,7 +59,7 @@ The sketch lives under `Arduino_MegaBurner/`. Rough shape:
 
 | File | Role |
 |------|------|
-| `MegaBurner_arduino.ino` | Main sketch: serial command dispatch (`C`/`R`/`E`/`W`/`S`), the two activity LEDs (D12 = write, D13 = read), the startup "I'm alive" LED flash, and runtime chip selection via the `activeChip` pointer. |
+| `MegaBurner_arduino.ino` | Main sketch: serial command dispatch (`C`/`R`/`E`/`W`/`S`/`P`), the two activity LEDs (D12 = write, D13 = read), the startup "I'm alive" LED flash, and runtime chip selection via the `activeChip` pointer. |
 | `FlashChip.h` | Abstract base class every chip driver implements (`init`, `readId`, `reset`, `read16`, `write16`, `erase`) — this is what makes runtime chip switching possible. |
 | `MX29L3211.h` / `.ino` | Driver for the MX29L3211 (has a real multi-word page-buffer program feature). |
 | `MX29LV320E.h` / `.ino` | Driver for MX29LV320E Top-Boot/Bottom-Boot (single-word program only; one driver covers both boot variants — they only differ in silicon ID, not command set). |
@@ -76,6 +76,7 @@ connection):
 | `E` | Erase the whole chip | `%` once done |
 | `W<offset>,<page>,<n>` | Write `n` bytes at `offset` | `&` when ready to receive, then `n` raw bytes, then `%` when done |
 | `S<name>` | Select which chip driver is active (e.g. `SMX26L6420`) | `%` once that chip's `init()` completes |
+| `P` | Ping / identify the board | `megaburner` — used by the Python host to find the right serial port automatically. Deliberately never touches the chip, so it is harmless to send to an unknown device. |
 
 ### Adding a chip to the Arduino side
 
@@ -95,18 +96,23 @@ The host code lives under `Python_MegaBurner/`, structured as a small package pl
 | `megaburner/chips.py` | The chip database — one `Chip` entry per supported chip/variant. |
 | `megaburner/fileio.py` | Load/save ROM files, random test-data generation. |
 | `megaburner/progress.py` | Plain console progress bar/spinner (no extra dependencies). |
-| `test_megaburner.py` | Full round-trip test: connect → check ID → erase → write → read back → CRC32 compare. Config (COM port, chip, ROM file or random test data) is edited directly at the top of the script — no command-line arguments to remember. |
+| `full_cycle_chip.py` | Full round-trip test: connect → check ID → erase → write → read back → CRC32 compare. Config (chip, ROM file or random test data, optional fixed COM port) is edited directly at the top of the script — no command-line arguments to remember. |
 | `dump_chip.py` | Read-only: connect → check ID → read → save to a file. No erase, no write — useful for a first look at a chip or just backing up a cart. |
 
 ### Using it
 
-Open either script, edit the configuration block at the top (at minimum the COM port and which chip you're using — a commented list of
+Open either script, edit the configuration block at the top (at minimum which chip you're using — a commented list of
 supported chips is right there in the file), then run it:
 
 ```
 python dump_chip.py
 python full_cycle_chip.py
 ```
+
+**Finding the board:** both scripts default to `AUTODETECT_PORT = True`, which pings every available serial port and picks the one that
+identifies itself as a MegaBurner — so you normally don't need to know or set a COM port at all. If you'd rather pin it down (several boards
+connected, or you just want a fixed port), set `AUTODETECT_PORT = False` and set `COM_PORT` to the port you want. Autodetection also falls back
+to `COM_PORT` if no board answers the ping.
 
 I strongly recommend running and editing scripts from VScode. Both scripts create their output files (ROM dumps, readback files) next to the script itself, regardless of what folder you launched Python from. The code is voluntarily "script only" to keep the project as much portable as possible.
 

@@ -47,6 +47,9 @@ class Timeouts:
     write_signal: float = 20.0       # waiting for '&' or '%' around each write block
     select_signal: float = 10.0      # waiting for '%' after selecting a chip (runs that
                                       # chip's init(), which includes an id-read + reset)
+    ping_reply: float = 2.0          # waiting for the "megaburner" reply while probing one
+                                      # port during autodetect - kept short so scanning
+                                      # several ports stays quick
 
 
 class MegaBurner:
@@ -58,6 +61,8 @@ class MegaBurner:
     ERASE_COMMAND = b"E"
     WRITE_COMMAND = "W"
     SELECT_COMMAND = "S"
+    PING_COMMAND = b"P"
+    PING_REPLY = "megaburner"  # what the firmware answers to PING_COMMAND
     SIGNAL_BEGIN = ord("&")
     SIGNAL_END = ord("%")
     SIGNAL_FAIL = ord("!")  # chip reported "never completed" (see busyCheck() timeout
@@ -83,6 +88,68 @@ class MegaBurner:
     def list_ports() -> list[str]:
         """Equivalent to SerialHelper.getAvailableSerialPorts()."""
         return [p.device for p in serial.tools.list_ports.comports()]
+
+    @classmethod
+    def ping_port(cls, port: str, timeouts: Optional["Timeouts"] = None,
+                  debug: bool = False) -> bool:
+        """Return True if `port` answers the ping command like a MegaBurner.
+
+        Opens the port on its own (nothing else may hold it at the same
+        time), sends PING_COMMAND, and looks for PING_REPLY in the
+        answer. Any failure - port busy, permission denied, no reply,
+        wrong reply, garbage - is treated as "not a MegaBurner" and
+        returns False rather than raising, because this is used to probe
+        ports that may well belong to completely unrelated devices.
+
+        Note the ping is deliberately a standalone command that never
+        touches the chip, so probing an unknown device is harmless in
+        both directions.
+        """
+        t = timeouts or Timeouts()
+        try:
+            with serial.Serial(
+                port=port,
+                baudrate=cls.BAUD_RATE,
+                bytesize=serial.EIGHTBITS,
+                parity=serial.PARITY_NONE,
+                stopbits=serial.STOPBITS_ONE,
+                timeout=t.ping_reply,
+            ) as ser:
+                # The Mega resets when the port opens - it can't answer
+                # anything until its boot sequence finishes.
+                time.sleep(t.connect_settle)
+                ser.reset_input_buffer()
+
+                ser.write(cls.PING_COMMAND)
+                ser.flush()
+
+                reply = ser.readline()
+                text = reply.decode("ascii", errors="replace").strip()
+                if debug:
+                    print(f"[DEBUG ping] {port}: {text!r}")
+                return cls.PING_REPLY in text
+        except Exception as exc:  # noqa: BLE001 - see docstring
+            if debug:
+                print(f"[DEBUG ping] {port}: skipped ({exc})")
+            return False
+
+    @classmethod
+    def autodetect_port(cls, timeouts: Optional["Timeouts"] = None,
+                        debug: bool = False,
+                        on_probe: Optional[Callable[[str], None]] = None) -> Optional[str]:
+        """Scan every available serial port and return the first one that
+        answers the ping, or None if no MegaBurner was found.
+
+        `on_probe`, if given, is called with each port name just before
+        it is probed - useful for printing progress, since each port
+        takes a couple of seconds to test.
+        """
+        for port in cls.list_ports():
+            if on_probe:
+                on_probe(port)
+            if cls.ping_port(port, timeouts=timeouts, debug=debug):
+                return port
+        return None
 
     @property
     def connected(self) -> bool:

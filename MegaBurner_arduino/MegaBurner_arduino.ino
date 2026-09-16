@@ -49,6 +49,24 @@ void selectChip(String name) {
 	Serial.println('%');
 }
 
+/*
+ * Identify this device to the host
+ *
+ * Command is "P". Replies with "megaburner" so the host can scan
+ * every available serial port and find the Arduino automatically,
+ * instead of the user having to hard-code a COM port number.
+ *
+ * Deliberately a distinct command from anything that touches the
+ * chip: a ping must be completely harmless to send to an unknown
+ * device (the host will be probing ports that might be a mouse, a
+ * modem, another microcontroller...), and equally harmless to
+ * receive here regardless of which chip is selected or whether one
+ * is even connected.
+ */
+void ping() {
+	Serial.println("megaburner");
+}
+
 // LED activity indicators
 // D13 lights up whenever data is being WRITTEN TO the chip (write + erase)
 // D12 lights up whenever data is being READ FROM the chip
@@ -202,6 +220,9 @@ void loop() {
 				break;
 			case 'S':
 				selectChip(COMMAND_DATA.substring(1));
+				break;
+			case 'P':
+				ping();
 				break;
 			default:
 				break;
