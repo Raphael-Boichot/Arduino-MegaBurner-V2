@@ -45,7 +45,7 @@ Arduino Mega are dirt cheap on second hand market, in particular Chinese clones,
 
 ![](/Pictures/Arduino_Mega_2560_Rev3_pinout.png)
 
-Take VCC on the +5V, it is now 3.3V.
+Take VCC for the PSOP44 pin 23 on the +5V, it is now stable 3.3V. The 3.3V pin cannot provide a stable voltage anymore after the 3.3V mod, forget it.
 
 ![](/Pictures/SOP44_Pinout.png)
 
