@@ -47,10 +47,6 @@ Arduino Mega are dirt cheap on second hand market, in particular Chinese clones,
 
 Take VCC for the PSOP44 pin 23 on the +5V, it is now stable 3.3V. The 3.3V pin cannot provide a stable voltage anymore after the 3.3V mod, forget it.
 
-![](/Pictures/SOP44_Pinout.png)
-
-Just strictly follow the pinout given here. It requires lots of spaghetti wiring but it does not justify making a dedicated PCB because mess of wires are cool. Just use the cheapest generic Arduino Mega shield and solder.
-
 You can add a red LED connected to D12 (Writing) and a green LED connected to D13 (Reading) to have real time information from the board itself. Use 360 Ohms resistors to protect them.
 
 ![](/Pictures/Mega_and_shields.JPG)
