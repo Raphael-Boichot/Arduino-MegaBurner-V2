@@ -47,7 +47,7 @@ class Timeouts:
     write_signal: float = 20.0       # waiting for '&' or '%' around each write block
     select_signal: float = 10.0      # waiting for '%' after selecting a chip (runs that
                                       # chip's init(), which includes an id-read + reset)
-    ping_reply: float = 2.0          # waiting for the "megaburner" reply while probing one
+    ping_reply: float = 3.0          # waiting for the "megaburner" reply while probing one
                                       # port during autodetect - kept short so scanning
                                       # several ports stays quick
 
@@ -113,18 +113,37 @@ class MegaBurner:
                 bytesize=serial.EIGHTBITS,
                 parity=serial.PARITY_NONE,
                 stopbits=serial.STOPBITS_ONE,
-                timeout=t.ping_reply,
+                timeout=0.3,
             ) as ser:
                 # The Mega resets when the port opens - it can't answer
-                # anything until its boot sequence finishes.
+                # anything until its boot sequence finishes. Boot timing
+                # has some real variance (see connect()'s own
+                # _drain_until_quiet() for the same issue) - a single
+                # fixed sleep + one-shot reset_input_buffer() + a single
+                # readline() call is fragile against that variance and
+                # can easily race with the firmware's own unsolicited
+                # startup chip-ID output. So instead of one clean read,
+                # accumulate everything received over the whole
+                # ping_reply window and just look for PING_REPLY
+                # anywhere in it - robust to boot noise, partial reads,
+                # or the reply arriving in more than one chunk.
                 time.sleep(t.connect_settle)
                 ser.reset_input_buffer()
 
                 ser.write(cls.PING_COMMAND)
                 ser.flush()
 
-                reply = ser.readline()
-                text = reply.decode("ascii", errors="replace").strip()
+                buf = bytearray()
+                target = cls.PING_REPLY.encode("ascii")
+                deadline = time.monotonic() + t.ping_reply
+                while time.monotonic() < deadline:
+                    chunk = ser.read(64)
+                    if chunk:
+                        buf += chunk
+                        if target in buf:
+                            break
+
+                text = buf.decode("ascii", errors="replace")
                 if debug:
                     print(f"[DEBUG ping] {port}: {text!r}")
                 return cls.PING_REPLY in text
