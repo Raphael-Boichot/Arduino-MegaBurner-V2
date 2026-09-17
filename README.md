@@ -45,7 +45,7 @@ Arduino Mega are dirt cheap on second hand market, in particular Chinese clones,
 
 ![](/Pictures/Arduino_Mega_2560_Rev3_pinout.png)
 
-Take VCC for the PSOP44 pin 23 on the +5V, it is now stable 3.3V. The 3.3V pin cannot provide a stable voltage anymore after the 3.3V mod, forget it.
+Wire VCC for the PSOP44 pin 23 on the +5V, it is now stable 3.3V. The 3.3V pin cannot provide a stable voltage anymore after the 3.3V mod, just forget it.
 
 You can add a red LED connected to D12 (Writing) and a green LED connected to D13 (Reading) to have real time information from the board itself. Use 360 Ohms resistors to protect them.
 
