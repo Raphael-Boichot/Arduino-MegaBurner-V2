@@ -6,7 +6,7 @@ An Arduino Mega 2560-based programmer for 3.3V parallel flash/EPROM chips used i
 
 List of chips supported to date:
 - MX29L3211 @PSOP44
-- MX29LV320 @PSOP44
+- MX29LV320E @PSOP44
 - MX26L6420 @PSOP44
 
 As I can only add chips that I own for testing, the list is basically restricted to my needs for now. 
@@ -59,7 +59,7 @@ Next is my prototype, perfectly working despite the mess of wires.
 
 ## 4. Arduino firmware structure
 
-The sketch lives under `Arduino_MegaBurner/`. Rough shape:
+The sketch lives under `MegaBurner_arduino/`. Rough shape:
 
 | File | Role |
 |------|------|
@@ -85,13 +85,13 @@ connection):
 ### Adding a chip to the Arduino side
 
 1. **Get the real datasheet.** Never assume a new chip shares another one's command set just because it's the same package or a similar part number. At minimum, confirm: unlock addresses, whether it has a page-buffer program feature or only single-word program, how busy/done status is polled (a fixed address vs. the address you're actually writing to; DQ7 alone vs. DQ7+DQ6 together), and the exact reset sequence.
-2. Copy `MX26L6420.h`/`.ino` as a template and adjust for the new chip's actual sequences, inheriting from `FlashChip`.
+2. Copy `MX29LV320E.h`/`.ino` as a template and adjust for the new chip's actual sequences, inheriting from `FlashChip`.
 3. In `MegaBurner_arduino.ino`: `#include` the new header, instantiate the chip object, and add an `else if` branch to `selectChip()`.
 4. Reflash, then verify with a read-only check (chip ID, then a read) before ever trying an erase/write on real hardware.
 
 ## 5. Python host
 
-The host code lives under `Python_MegaBurner/`, structured as a small package plus two ready-to-run scripts. Only dependency: `pyserial`
+The host code lives under `MegaBurner_python/`, structured as a small package plus two ready-to-run scripts. Only dependency: `pyserial`
 (`pip install pyserial`).
 
 | File | Role |
