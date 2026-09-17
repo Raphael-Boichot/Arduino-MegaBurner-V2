@@ -6,7 +6,8 @@ An Arduino Mega 2560-based programmer for 3.3V parallel flash/EPROM chips used i
 
 List of chips supported to date:
 - MX29L3211 @PSOP44
-- MX29LV320E @PSOP44
+- MX29LV320ET @PSOP44
+- MX29LV320EB @PSOP44
 - MX26L6420 @PSOP44
 
 As I can only add chips that I own for testing, the list is basically restricted to my needs for now. 
