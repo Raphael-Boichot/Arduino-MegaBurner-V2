@@ -36,7 +36,7 @@ class Timeouts:
     meant to run unattended (see test_megaburner.py), so every
     operation fails LOUDLY with a clear error rather than hanging
     forever if the hardware doesn't respond."""
-    connect_settle: float = 2.5      # wait after opening the port for the Mega to reboot -
+    connect_settle: float = 4.0      # wait after opening the port for the Mega to reboot -
                                       # must exceed the firmware's full boot sequence (LED
                                       # flash + startup chip-ID read + reset settle, ~1.6s)
     block_read: float = 10.0         # per serial.read() call while pulling a read/verify block
@@ -47,7 +47,7 @@ class Timeouts:
     write_signal: float = 20.0       # waiting for '&' or '%' around each write block
     select_signal: float = 10.0      # waiting for '%' after selecting a chip (runs that
                                       # chip's init(), which includes an id-read + reset)
-    ping_reply: float = 3.0          # waiting for the "megaburner" reply while probing one
+    ping_reply: float = 1.0          # waiting for the "megaburner" reply while probing one
                                       # port during autodetect - kept short so scanning
                                       # several ports stays quick
 

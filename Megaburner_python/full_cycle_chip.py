@@ -39,7 +39,7 @@ AUTODETECT_PORT = True
 
 # Used when AUTODETECT_PORT is False, or as a fallback if autodetection
 # finds nothing. e.g. "COM5" on Windows, "/dev/ttyACM0" on Linux.
-COM_PORT = "COM6"
+COM_PORT = "COM7"
 # Uncomment exactly ONE of the lines below (must match megaburner/chips.py)
 CHIP_NAME = "MX29L3211"        # 32Mbit, 3.3V flash, page-buffer program
 # CHIP_NAME = "MX29LV320ET"      # 32Mbit, 3V flash, SOP44, Top-Boot
