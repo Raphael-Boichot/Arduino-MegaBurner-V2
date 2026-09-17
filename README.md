@@ -45,13 +45,15 @@ Arduino Mega are dirt cheap on second hand market, in particular Chinese clones,
 
 ![](/Pictures/Arduino_Mega_2560_Rev3_pinout.png)
 
-Wire VCC for the PSOP44 pin 23 on the +5V, it is now stable 3.3V. The 3.3V pin cannot provide a stable voltage anymore after the 3.3V mod, just forget it.
+Wire VCC for the PSOP44 pin 23 on the +5V, it is now stable 3.3V. The 3.3V pin cannot provide a stable voltage anymore after the 3.3V mod, just forget it. You can add a red LED connected to D12 (Writing) and a green LED connected to D13 (Reading) to have real time information from the board itself. Use 360 Ohms resistors to protect them. The PSOP44 to DIP44 adapter is a generic brand from Amazon, nothing fancy. I've mounted it on pin headers in order to be able to change it without wasting the shield. Double check each connection with a multimeter before attempting any burn.
 
-You can add a red LED connected to D12 (Writing) and a green LED connected to D13 (Reading) to have real time information from the board itself. Use 360 Ohms resistors to protect them.
+You wire everything by hand or use the [dedicated PCB](/PCB/) given with the project.
+
+![](/PCB/PCB.png)
+
+Next is my prototype wired by hand.
 
 ![](/Pictures/Mega_and_shields.JPG)
-
-The PSOP44 to DIP44 adapter is a generic brand from Amazon, nothing fancy. I've mounted it on pin headers in order to be able to change it without wasting the shield. Double check each connection with a multimeter before attempting any burn.
 
 ## 4. Arduino firmware structure
 
