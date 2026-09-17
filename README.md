@@ -50,7 +50,7 @@ Wire VCC for the PSOP44 pin 23 on the +5V, it is now stable 3.3V. The 3.3V pin c
 
 You can add a red LED connected to D12 (Writing) and a green LED connected to D13 (Reading) to have real time information from the board itself. Use 360 Ohms resistors to protect them. The PSOP44 to DIP44 adapter is a generic brand from Amazon, nothing fancy. I've mounted it on pin headers in order to be able to change it without wasting the shield. Double check each connection with a multimeter before attempting any burn.
 
-Wire everything by hand on a generic shield like me or more simply, use the [dedicated PCB](/PCB/) given with the project.
+Wire everything by hand on a generic shield like me or more simply, use the [dedicated PCB](/PCB/) given with the project. I recommend using long pin headers for the connection to the Arduino (15 or 17 mm), standard 13 mm pin headers are much to stiff for the task.
 
 ![](/PCB/PCB.png)
 
