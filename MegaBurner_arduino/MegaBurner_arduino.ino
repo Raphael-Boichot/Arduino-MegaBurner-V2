@@ -5,6 +5,9 @@
  * Version 1.0
  * Date 2017.11.11
  * Contact: mingzo@gmail.com
+ * Version 1.1
+ * Date 2026.09.17
+ * Author: Raphael BOICHOT
  */
 #include "MegaBurner.h"
 #include "FlashChip.h"
