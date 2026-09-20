@@ -132,3 +132,5 @@ Add a `Chip(...)` entry to `megaburner/chips.py`. Every field is required and do
 - [maximaas](https://github.com/maximaas) for the original [MegaBurner](https://github.com/maximaas/MegaBurner) project this is built on.
 - [sanni](https://github.com/sanni) for the [Cart Reader](https://github.com/sanni/cartreader) and its huge amount of open documentation.
 - Claude AI, without which this project would have taken up far too much of my free time – which has already been the case, given the sheer volume of hardware tests in the real world that needed to be carried out before releasing this project in the wild.
+
+![](/Pictures/Dev_notes.jpg)
