@@ -134,3 +134,5 @@ Add a `Chip(...)` entry to `megaburner/chips.py`. Every field is required and do
 - Claude AI, without which this project would have taken up far too much of my free time – which has already been the case, given the sheer volume of hardware tests in the real world that needed to be carried out before releasing this project in the wild.
 
 ![](/Pictures/Dev_notes.jpg)
+
+Claude A.I. maybe, but human tests at every steps
